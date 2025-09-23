@@ -14,6 +14,7 @@ ACPCharacterPlayer::ACPCharacterPlayer()
 	CameraBoom->SetUsingAbsoluteRotation(true);
 	CameraBoom->SetWorldRotation(FRotator(-50.0f, 0.0f, 0.0f));
 	CameraBoom->bUsePawnControlRotation = false;
+	CameraBoom->bDoCollisionTest = false;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);

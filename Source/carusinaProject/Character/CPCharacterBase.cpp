@@ -18,13 +18,18 @@ ACPCharacterBase::ACPCharacterBase()
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Pawn"));
 
 	// Movement
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 640.0f);
-	GetCharacterMovement()->JumpZVelocity = 420.0f;
-	GetCharacterMovement()->AirControl = 0.05f;
+	GetCharacterMovement()->GravityScale = 1.5f;
+	GetCharacterMovement()->MaxAcceleration = 1000.0f;
+	GetCharacterMovement()->BrakingFrictionFactor = 1.0f;
+	GetCharacterMovement()->PerchRadiusThreshold = 20.0f;
+	GetCharacterMovement()->bUseFlatBaseForFloorChecks = true;
 	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 0.0f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 1000.0f;
+	GetCharacterMovement()->JumpZVelocity = 420.0f;
+	GetCharacterMovement()->AirControl = 0.05f;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 640.0f, 0.0f);
 
 	// Mesh
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -100.0f), FRotator(0.0f, -90.0f, 0.0f));

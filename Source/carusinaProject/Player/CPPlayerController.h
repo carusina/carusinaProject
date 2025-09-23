@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "NiagaraFunctionLibrary.h"
 #include "CPPlayerController.generated.h"
 
 /**
@@ -39,4 +40,7 @@ protected:
 private:
 	// Player Input Section
 	FVector GoalLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UNiagaraSystem> FXCursor;
 };

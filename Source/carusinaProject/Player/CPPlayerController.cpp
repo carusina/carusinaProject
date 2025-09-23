@@ -23,6 +23,12 @@ ACPPlayerController::ACPPlayerController()
 	{
 		SetDestinationAction = SetDestinationActionRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> FXCursorRef(TEXT("/Script/Niagara.NiagaraSystem'/Game/carusinaProject/Input/Cursor/FX_Cursor.FX_Cursor'"));
+	if (FXCursorRef.Object)
+	{
+		FXCursor = FXCursorRef.Object;
+	}
 }
 
 void ACPPlayerController::BeginPlay()
@@ -68,10 +74,10 @@ void ACPPlayerController::GetLocationUnderCursor()
 
 		ControlledPawn->AddMovementInput(Direction, 1.0, false);
 	}
-	
 }
 
 void ACPPlayerController::MoveToLocation()
 {
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, GoalLocation);
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), FXCursor, GoalLocation);
 }
