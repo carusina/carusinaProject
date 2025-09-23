@@ -42,7 +42,7 @@ ACPCharacterBase::ACPCharacterBase()
 		GetMesh()->SetSkeletalMesh(CharacterSkeletalMeshRef.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Characters/Mannequins/Animations/ABP_Manny.ABP_Manny_C"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/carusinaProject/Animation/ABP_CPCharacterPlayer.ABP_CPCharacterPlayer_C"));
 	if (AnimInstanceClassRef.Class)
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
