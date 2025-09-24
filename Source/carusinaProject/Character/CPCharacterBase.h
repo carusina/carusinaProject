@@ -18,20 +18,33 @@ public:
 	// Basic Attack Action
 	void ProcessBasicAttack();
 	void ProcessDodge();
-	void ClearDodgeCooldown();
 
+protected:
+	// Basic Attack Action
+	void ClearDodgeCooldown();
+	void BasicActionBegin();
+	void BasicActionEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	void SetComboCheckTimer();
+	void ComboCheck();
+	
 protected:
 	// Basic Attack Action
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> BasicAttackMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation|Attack")
+	TObjectPtr<class UABActionComboData> ActionComboData;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> DodgeMontage;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation|Dodge")
-	uint8 bCanDodge : 1;
+	uint8 bCanDodge : 1 = true;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation|Dodge")
-	int32 DodgeCooldownDuration;
+	float DodgeCooldownDuration = 5.0f;
+	int32 CurrentCombo = 0;
+	uint8 HasNextComboCommand : 1 = false;
+	
 	FTimerHandle DodgeCooldownTimer;
+	FTimerHandle ComboTimerHandle;
 };

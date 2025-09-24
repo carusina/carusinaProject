@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Animation/AnimMontage.h"
+#include "ABActionComboData.h"
 
 // Sets default values
 ACPCharacterBase::ACPCharacterBase()
@@ -48,16 +49,23 @@ ACPCharacterBase::ACPCharacterBase()
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
-
-	// Animation
-	bCanDodge = true;
-	DodgeCooldownDuration = 5.0f;
 }
 
 void ACPCharacterBase::ProcessBasicAttack()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(BasicAttackMontage);
+	if (CurrentCombo == 0)
+	{
+		BasicActionBegin();
+		return;
+	}
+	if (ComboTimerHandle.IsValid())
+	{
+		HasNextComboCommand = true;
+	}
+	else
+	{
+		HasNextComboCommand = false;
+	}
 }
 
 void ACPCharacterBase::ProcessDodge()
@@ -76,5 +84,59 @@ void ACPCharacterBase::ProcessDodge()
 
 void ACPCharacterBase::ClearDodgeCooldown()
 {
+	DodgeCooldownTimer.Invalidate();
 	bCanDodge = true;
+}
+
+void ACPCharacterBase::BasicActionBegin()
+{
+	// Combo Status
+	CurrentCombo = 1;
+
+	// Animation
+	const float AttackSpeedRate = 1.0f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(BasicAttackMontage, AttackSpeedRate);
+
+	FOnMontageEnded EndDelegate;
+	EndDelegate.BindUObject(this, &ACPCharacterBase::BasicActionEnd);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, BasicAttackMontage);
+
+	ComboTimerHandle.Invalidate();
+	SetComboCheckTimer();
+}
+
+void ACPCharacterBase::BasicActionEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+	ensure(CurrentCombo != 0);
+	CurrentCombo = 0;
+}
+
+void ACPCharacterBase::SetComboCheckTimer()
+{
+	int32 ComboIndex = CurrentCombo - 1;
+	ensure(ActionComboData->EffectiveFrameCount.IsValidIndex(ComboIndex));
+
+	const float AttackSpeedRate = 1.0f;
+	float ComboEffectiveTime = (ActionComboData->EffectiveFrameCount[ComboIndex] / ActionComboData->FrameRate) / AttackSpeedRate;
+	if (ComboEffectiveTime > 0.0f)
+	{
+		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &ACPCharacterBase::ComboCheck, ComboEffectiveTime, false);
+	}
+}
+
+void ACPCharacterBase::ComboCheck()
+{
+	ComboTimerHandle.Invalidate();
+	
+	if (HasNextComboCommand)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ActionComboData->MaxComboCount);
+		FName NextSection = *FString::Printf(TEXT("%s%d"), *ActionComboData->MontageSectionNamePrefix, CurrentCombo);
+		AnimInstance->Montage_JumpToSection(NextSection, BasicAttackMontage);
+		SetComboCheckTimer();
+		HasNextComboCommand = false;
+	}
 }
