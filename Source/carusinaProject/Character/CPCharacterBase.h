@@ -5,16 +5,19 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/CPAnimationAttackyInterface.h"
+#include "Interface/CPCharacterWidgetInterface.h"
 #include "CPCharacterBase.generated.h"
 
 UCLASS()
-class CARUSINAPROJECT_API ACPCharacterBase : public ACharacter, public ICPAnimationAttackyInterface
+class CARUSINAPROJECT_API ACPCharacterBase : public ACharacter, public ICPAnimationAttackyInterface, public ICPCharacterWidgetInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
 	ACPCharacterBase();
+
+	virtual void PostInitializeComponents() override;
 	
 	// Basic Attack Action
 	void ProcessBasicAttack();
@@ -35,6 +38,9 @@ protected:
 	
 	// AnimNotify Section
 	virtual void AttackHitCheck() override;
+
+	// UI Widget Section
+	virtual void SetupCharacterWidget(class UCPUserWidget* UserWidget) override;
 	
 protected:
 	// Basic Attack Action
@@ -62,4 +68,12 @@ protected:
 	TObjectPtr<class UAnimMontage> DeadMontage;
 
 	float DeadEventDelay = 5.0f;
+
+	// Stat Section
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UCPCharacterStatComponent> Stat;
+
+	// UI Widget Section
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget|Health", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UCPWidgetComponent> HealthBar;
 };

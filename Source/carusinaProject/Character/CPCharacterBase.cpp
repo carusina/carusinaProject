@@ -5,8 +5,11 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ABActionComboData.h"
+#include "CharacterStat/CPCharacterStatComponent.h"
+#include "UI/CPWidgetComponent.h"
 #include "Physics/CPCollision.h"
 #include "Engine/DamageEvents.h"
+#include "UI/CPHealthBarWidget.h"
 
 // Sets default values
 ACPCharacterBase::ACPCharacterBase()
@@ -50,6 +53,29 @@ ACPCharacterBase::ACPCharacterBase()
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
+
+	// Stat Component
+	Stat = CreateDefaultSubobject<UCPCharacterStatComponent>(TEXT("StatComponent"));
+	
+	// Widget Component
+	HealthBar = CreateDefaultSubobject<UCPWidgetComponent>(TEXT("WidgetComponent"));
+	HealthBar->SetupAttachment(GetMesh());
+	HealthBar->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
+	static ConstructorHelpers::FClassFinder<UUserWidget> HealthBarWidgetRef(TEXT("/Game/carusinaProject/UI/WBP_Health.WBP_Health_C"));
+	if (HealthBarWidgetRef.Class)
+	{
+		HealthBar->SetWidgetClass(HealthBarWidgetRef.Class);
+		HealthBar->SetWidgetSpace(EWidgetSpace::Screen);
+		HealthBar->SetDrawSize(FVector2D(150.0f, 15.0f));
+		HealthBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void ACPCharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	Stat->OnHealthZero.AddUObject(this, &ACPCharacterBase::SetDead);
 }
 
 void ACPCharacterBase::ProcessBasicAttack()
@@ -146,7 +172,9 @@ float ACPCharacterBase::TakeDamage(float DamageAmount, struct FDamageEvent const
 	class AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	SetDead(); // 임시
+	
+	Stat->ApplyDamage(DamageAmount);
+	
 	return DamageAmount;
 }
 
@@ -155,6 +183,7 @@ void ACPCharacterBase::SetDead()
 	GetCharacterMovement()->SetMovementMode(MOVE_None);
 	PlayDeadAnimation();
 	SetActorEnableCollision(false);
+	HealthBar->SetHiddenInGame(true);
 }
 
 void ACPCharacterBase::PlayDeadAnimation()
@@ -189,4 +218,15 @@ void ACPCharacterBase::AttackHitCheck()
 
 	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight + AttackRadius, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
 #endif
+}
+
+void ACPCharacterBase::SetupCharacterWidget(class UCPUserWidget* UserWidget)
+{
+	UCPHealthBarWidget* HealthBarWidget = Cast<UCPHealthBarWidget>(UserWidget);
+	if (HealthBarWidget)
+	{
+		HealthBarWidget->SetMaxHealth(Stat->GetMaxHealth());
+		HealthBarWidget->UpdateHealthBar(Stat->GetCurrentHealth());
+		Stat->OnHealthChanged.AddUObject(HealthBarWidget, &UCPHealthBarWidget::UpdateHealthBar);
+	}
 }
