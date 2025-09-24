@@ -28,6 +28,8 @@ private:
 	// Player Input Section
 	void GetLocationUnderCursor();
 	void MoveToLocation();
+	void BasicAttack();
+	void Dodge();
 	
 protected:
 	// Player Input Section
@@ -37,7 +39,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> SetDestinationAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> BasicAttackAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> DodgeAction;
+
 private:
+	// Controlled Character
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Controlled, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class ACPCharacterPlayer> ControlledCharacter;
+	
 	// Player Input Section
 	FVector GoalLocation;
 

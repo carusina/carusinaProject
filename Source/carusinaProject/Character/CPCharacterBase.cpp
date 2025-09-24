@@ -4,6 +4,7 @@
 #include "CPCharacterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Animation/AnimMontage.h"
 
 // Sets default values
 ACPCharacterBase::ACPCharacterBase()
@@ -47,4 +48,33 @@ ACPCharacterBase::ACPCharacterBase()
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
+
+	// Animation
+	bCanDodge = true;
+	DodgeCooldownDuration = 5.0f;
+}
+
+void ACPCharacterBase::ProcessBasicAttack()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(BasicAttackMontage);
+}
+
+void ACPCharacterBase::ProcessDodge()
+{
+	if (!bCanDodge)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Dodge is CoolDown."));
+		return;
+	}
+
+	bCanDodge = false;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(DodgeMontage);
+	GetWorld()->GetTimerManager().SetTimer(DodgeCooldownTimer, this, &ACPCharacterBase::ClearDodgeCooldown, DodgeCooldownDuration, false);
+}
+
+void ACPCharacterBase::ClearDodgeCooldown()
+{
+	bCanDodge = true;
 }

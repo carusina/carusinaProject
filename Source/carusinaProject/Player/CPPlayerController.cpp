@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "Character/CPCharacterPlayer.h"
 #include "Kismet/KismetMathLibrary.h"
 
 ACPPlayerController::ACPPlayerController()
@@ -29,6 +30,18 @@ ACPPlayerController::ACPPlayerController()
 	{
 		FXCursor = FXCursorRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> BasicAttackActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/carusinaProject/Input/Actions/IA_BasicAttack.IA_BasicAttack'"));
+	if (BasicAttackActionRef.Object)
+	{
+		BasicAttackAction = BasicAttackActionRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> DodgeActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/carusinaProject/Input/Actions/IA_DodgeAction.IA_DodgeAction'"));
+	if (DodgeActionRef.Object)
+	{
+		DodgeAction = DodgeActionRef.Object;
+	}
 }
 
 void ACPPlayerController::BeginPlay()
@@ -47,6 +60,8 @@ void ACPPlayerController::BeginPlay()
 			}
 		}
 	}
+
+	ControlledCharacter = CastChecked<ACPCharacterPlayer>(GetPawn());
 }
 
 void ACPPlayerController::SetupInputComponent()
@@ -59,6 +74,9 @@ void ACPPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(SetDestinationAction, ETriggerEvent::Started, this, &AController::StopMovement);
 	EnhancedInputComponent->BindAction(SetDestinationAction, ETriggerEvent::Canceled, this, &ACPPlayerController::MoveToLocation);
 	EnhancedInputComponent->BindAction(SetDestinationAction, ETriggerEvent::Completed, this, &ACPPlayerController::MoveToLocation);
+	
+	EnhancedInputComponent->BindAction(BasicAttackAction, ETriggerEvent::Triggered, this, &ACPPlayerController::BasicAttack);
+	EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ACPPlayerController::Dodge);
 }
 
 void ACPPlayerController::GetLocationUnderCursor()
@@ -68,11 +86,10 @@ void ACPPlayerController::GetLocationUnderCursor()
 	if (HitResult.bBlockingHit)
 	{
 		GoalLocation = HitResult.Location;
-		APawn* ControlledPawn = GetPawn();
-		const FVector ControlledPawnLocation = ControlledPawn->GetActorLocation();
-		FVector Direction = UKismetMathLibrary::GetDirectionUnitVector(ControlledPawnLocation, GoalLocation);
+		const FVector ControlledCharacterLocation = ControlledCharacter->GetActorLocation();
+		FVector Direction = UKismetMathLibrary::GetDirectionUnitVector(ControlledCharacterLocation, GoalLocation);
 
-		ControlledPawn->AddMovementInput(Direction, 1.0, false);
+		ControlledCharacter->AddMovementInput(Direction, 1.0, false);
 	}
 }
 
@@ -80,4 +97,14 @@ void ACPPlayerController::MoveToLocation()
 {
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, GoalLocation);
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), FXCursor, GoalLocation);
+}
+
+void ACPPlayerController::BasicAttack()
+{
+	ControlledCharacter->ProcessBasicAttack();
+}
+
+void ACPPlayerController::Dodge()
+{
+	ControlledCharacter->ProcessDodge();
 }

@@ -14,5 +14,24 @@ class CARUSINAPROJECT_API ACPCharacterBase : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ACPCharacterBase();
+	
+	// Basic Attack Action
+	void ProcessBasicAttack();
+	void ProcessDodge();
+	void ClearDodgeCooldown();
 
+protected:
+	// Basic Attack Action
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> BasicAttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> DodgeMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation|Dodge")
+	uint8 bCanDodge : 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation|Dodge")
+	int32 DodgeCooldownDuration;
+	FTimerHandle DodgeCooldownTimer;
 };
