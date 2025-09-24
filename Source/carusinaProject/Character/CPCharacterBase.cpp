@@ -4,8 +4,9 @@
 #include "CPCharacterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Animation/AnimMontage.h"
 #include "ABActionComboData.h"
+#include "Physics/CPCollision.h"
+#include "Engine/DamageEvents.h"
 
 // Sets default values
 ACPCharacterBase::ACPCharacterBase()
@@ -17,7 +18,7 @@ ACPCharacterBase::ACPCharacterBase()
 
 	// Capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.0f, 96.0f);
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Pawn"));
+	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_CPCAPSULE);
 
 	// Movement
 	GetCharacterMovement()->GravityScale = 1.5f;
@@ -36,7 +37,7 @@ ACPCharacterBase::ACPCharacterBase()
 	// Mesh
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -100.0f), FRotator(0.0f, -90.0f, 0.0f));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
+	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterSkeletalMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Assassin/Mesh/SKM_Assassin_Skin1.SKM_Assassin_Skin1'"));
 	if (CharacterSkeletalMeshRef.Object)
@@ -78,7 +79,7 @@ void ACPCharacterBase::ProcessDodge()
 
 	bCanDodge = false;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(DodgeMontage);
+	AnimInstance->Montage_Play(DodgeMontage, 1.5f);
 	GetWorld()->GetTimerManager().SetTimer(DodgeCooldownTimer, this, &ACPCharacterBase::ClearDodgeCooldown, DodgeCooldownDuration, false);
 }
 
@@ -139,4 +140,53 @@ void ACPCharacterBase::ComboCheck()
 		SetComboCheckTimer();
 		HasNextComboCommand = false;
 	}
+}
+
+float ACPCharacterBase::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+	class AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	SetDead(); // 임시
+	return DamageAmount;
+}
+
+void ACPCharacterBase::SetDead()
+{
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
+	PlayDeadAnimation();
+	SetActorEnableCollision(false);
+}
+
+void ACPCharacterBase::PlayDeadAnimation()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->StopAllMontages(0.0f);
+	AnimInstance->Montage_Play(DeadMontage);
+}
+
+void ACPCharacterBase::AttackHitCheck()
+{
+	FHitResult HitResult;
+	const FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
+
+	const float AttackRange = 40.0f;
+	const float AttackRadius = 50.0f;
+	const float AttackDamage = 30.0f;
+	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
+	const FVector End = Start + GetActorForwardVector() * AttackRange;
+
+	bool HitDetected = GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, CCHANNEL_CPACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
+	if (HitDetected)
+	{
+		FDamageEvent DamageEvent;
+		HitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+	}
+
+#if ENABLE_DRAW_DEBUG
+	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+	float CapsuleHalfHeight = AttackRange * 0.5f;
+	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+
+	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight + AttackRadius, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
+#endif
 }

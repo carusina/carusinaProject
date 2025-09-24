@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/CPAnimationAttackyInterface.h"
 #include "CPCharacterBase.generated.h"
 
 UCLASS()
-class CARUSINAPROJECT_API ACPCharacterBase : public ACharacter
+class CARUSINAPROJECT_API ACPCharacterBase : public ACharacter, public ICPAnimationAttackyInterface
 {
 	GENERATED_BODY()
 
@@ -26,6 +27,14 @@ protected:
 	void BasicActionEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	void SetComboCheckTimer();
 	void ComboCheck();
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	// Dead Section
+	virtual void SetDead();
+	void PlayDeadAnimation();
+	
+	// AnimNotify Section
+	virtual void AttackHitCheck() override;
 	
 protected:
 	// Basic Attack Action
@@ -47,4 +56,10 @@ protected:
 	
 	FTimerHandle DodgeCooldownTimer;
 	FTimerHandle ComboTimerHandle;
+
+	// Dead Section
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation|Dead")
+	TObjectPtr<class UAnimMontage> DeadMontage;
+
+	float DeadEventDelay = 5.0f;
 };
