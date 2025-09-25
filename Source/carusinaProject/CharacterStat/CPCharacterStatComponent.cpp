@@ -38,12 +38,13 @@ void UCPCharacterStatComponent::SetLevel(int32 NewLevel)
 	CurrentLevel = FMath::Clamp(NewLevel, 1, UCPGameSingleton::Get().GetCharacterMaxLevel());
 	BaseStat = UCPGameSingleton::Get().GetCharacterStat(CurrentLevel);
 	check(BaseStat.MaxHealth > 0.0f);
+	SetCurrentHealth(GetTotalStat().MaxHealth);
 }
 
 void UCPCharacterStatComponent::SetCurrentHealth(const float NewHealth)
 {
-	CurrentHealth = FMath::Clamp<float>(NewHealth, 0, BaseStat.MaxHealth);
-	OnHealthChanged.Broadcast(CurrentHealth);
+	CurrentHealth = FMath::Clamp<float>(NewHealth, 0, GetTotalStat().MaxHealth);
+	OnHealthChanged.Broadcast(CurrentHealth, GetTotalStat().MaxHealth);
 }
 
 void UCPCharacterStatComponent::HealHealth(float HealAmount)

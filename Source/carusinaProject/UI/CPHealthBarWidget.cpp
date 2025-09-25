@@ -7,13 +7,10 @@
 
 UCPHealthBarWidget::UCPHealthBarWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	MaxHealth = -1.0f;
 }
 
-void UCPHealthBarWidget::UpdateHealthBar(float NewCurrentHealth)
+void UCPHealthBarWidget::UpdateHealthBar(float NewCurrentHealth, float MaxHealth)
 {
-	ensure(MaxHealth > 0.0f);
-
 	if (HealthProgressBar)
 	{
 		HealthProgressBar->SetPercent(NewCurrentHealth / MaxHealth);

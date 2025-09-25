@@ -17,8 +17,7 @@ class CARUSINAPROJECT_API UCPHealthBarWidget : public UCPUserWidget
 public:
 	UCPHealthBarWidget(const FObjectInitializer& ObjectInitializer);
 
-	FORCEINLINE void SetMaxHealth(float NewMaxHealth) { MaxHealth = NewMaxHealth; }
-	void UpdateHealthBar(float NewCurrentHealth);
+	void UpdateHealthBar(float NewCurrentHealth, float MaxHealth);
 
 protected:
 	virtual void NativeConstruct() override;
@@ -26,7 +25,4 @@ protected:
 protected:
 	UPROPERTY()
 	TObjectPtr<class UProgressBar> HealthProgressBar;
-
-	UPROPERTY()
-	float MaxHealth;
 };

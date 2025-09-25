@@ -230,8 +230,7 @@ void ACPCharacterBase::SetupCharacterWidget(class UCPUserWidget* UserWidget)
 	UCPHealthBarWidget* HealthBarWidget = Cast<UCPHealthBarWidget>(UserWidget);
 	if (HealthBarWidget)
 	{
-		HealthBarWidget->SetMaxHealth(Stat->GetTotalStat().MaxHealth);
-		HealthBarWidget->UpdateHealthBar(Stat->GetCurrentHealth());
+		HealthBarWidget->UpdateHealthBar(Stat->GetCurrentHealth(), Stat->GetTotalStat().MaxHealth);
 		Stat->OnHealthChanged.AddUObject(HealthBarWidget, &UCPHealthBarWidget::UpdateHealthBar);
 	}
 }

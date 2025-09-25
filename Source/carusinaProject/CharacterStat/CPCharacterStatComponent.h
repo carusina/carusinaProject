@@ -8,7 +8,7 @@
 #include "CPCharacterStatComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnHealthZeroDelegate);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChangedDelegate, float /* Current Hp */);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHealthChangedDelegate, float /* Current Hp */, float /* MaxHealth */);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CARUSINAPROJECT_API UCPCharacterStatComponent : public UActorComponent
