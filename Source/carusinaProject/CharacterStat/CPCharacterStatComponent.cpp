@@ -2,11 +2,22 @@
 
 
 #include "CharacterStat/CPCharacterStatComponent.h"
+#include "GameData/CPGameSingleton.h"
 
 // Sets default values for this component's properties
 UCPCharacterStatComponent::UCPCharacterStatComponent()
 {
-	MaxHealth = 100.0f;
+	CurrentLevel = 1;
+
+	bWantsInitializeComponent = true;
+}
+
+void UCPCharacterStatComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	SetLevel(CurrentLevel);
+	SetCurrentHealth(BaseStat.MaxHealth);
 }
 
 
@@ -21,16 +32,20 @@ float UCPCharacterStatComponent::ApplyDamage(float DamageAmount)
 	return DamageAmount;
 }
 
-// Called when the game starts
-void UCPCharacterStatComponent::BeginPlay()
+void UCPCharacterStatComponent::SetLevel(int32 NewLevel)
 {
-	Super::BeginPlay();
-
-	CurrentHealth = MaxHealth;
+	CurrentLevel = FMath::Clamp(NewLevel, 1, UCPGameSingleton::Get().GetCharacterMaxLevel());
+	BaseStat = UCPGameSingleton::Get().GetCharacterStat(CurrentLevel);
+	check(BaseStat.MaxHealth > 0.0f);
 }
 
 void UCPCharacterStatComponent::SetCurrentHealth(const float NewHealth)
 {
-	CurrentHealth = FMath::Clamp<float>(NewHealth, 0, MaxHealth);
+	CurrentHealth = FMath::Clamp<float>(NewHealth, 0, BaseStat.MaxHealth);
 	OnHealthChanged.Broadcast(CurrentHealth);
+}
+
+void UCPCharacterStatComponent::HealHealth(float HealAmount)
+{
+	SetCurrentHealth(CurrentHealth + HealAmount);
 }

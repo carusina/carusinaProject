@@ -16,6 +16,9 @@ class CARUSINAPROJECT_API ACPCharacterPlayer : public ACPCharacterBase
 
 public:
 	ACPCharacterPlayer();
+
+public:
+	void GainExperience(float Amount);
 	
 protected:
 	// Camera Section
@@ -24,4 +27,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> Camera;
+
+	// Experience
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Experience")
+	float CurrentExperience;
 };

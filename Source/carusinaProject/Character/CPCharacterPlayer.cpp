@@ -3,6 +3,7 @@
 
 #include "CPCharacterPlayer.h"
 #include "Camera/CameraComponent.h"
+#include "CharacterStat/CPCharacterStatComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 ACPCharacterPlayer::ACPCharacterPlayer()
@@ -20,4 +21,16 @@ ACPCharacterPlayer::ACPCharacterPlayer()
 	Camera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	Camera->bUsePawnControlRotation = false;
 	Camera->FieldOfView = 55.0f;
+}
+
+void ACPCharacterPlayer::GainExperience(float Amount)
+{
+	CurrentExperience += Amount;
+	if (CurrentExperience >= Stat->GetBaseStat().RequiredExperience)
+	{
+		CurrentExperience -= Stat->GetBaseStat().RequiredExperience;
+		
+		Stat->SetLevel(Stat->GetCurrentLevel() + 1);
+		GainExperience(0.0f);
+	}
 }

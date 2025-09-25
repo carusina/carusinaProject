@@ -121,7 +121,7 @@ void ACPCharacterBase::BasicActionBegin()
 	CurrentCombo = 1;
 
 	// Animation
-	const float AttackSpeedRate = 1.0f;
+	const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(BasicAttackMontage, AttackSpeedRate);
 
@@ -144,7 +144,7 @@ void ACPCharacterBase::SetComboCheckTimer()
 	int32 ComboIndex = CurrentCombo - 1;
 	ensure(ActionComboData->EffectiveFrameCount.IsValidIndex(ComboIndex));
 
-	const float AttackSpeedRate = 1.0f;
+	const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
 	float ComboEffectiveTime = (ActionComboData->EffectiveFrameCount[ComboIndex] / ActionComboData->FrameRate) / AttackSpeedRate;
 	if (ComboEffectiveTime > 0.0f)
 	{
@@ -198,9 +198,9 @@ void ACPCharacterBase::AttackHitCheck()
 	FHitResult HitResult;
 	const FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 
-	const float AttackRange = 40.0f;
+	const float AttackRange = Stat->GetTotalStat().AttackRange;
 	const float AttackRadius = 50.0f;
-	const float AttackDamage = 30.0f;
+	const float AttackDamage = Stat->GetTotalStat().AttackDamage;
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 
@@ -225,7 +225,7 @@ void ACPCharacterBase::SetupCharacterWidget(class UCPUserWidget* UserWidget)
 	UCPHealthBarWidget* HealthBarWidget = Cast<UCPHealthBarWidget>(UserWidget);
 	if (HealthBarWidget)
 	{
-		HealthBarWidget->SetMaxHealth(Stat->GetMaxHealth());
+		HealthBarWidget->SetMaxHealth(Stat->GetTotalStat().MaxHealth);
 		HealthBarWidget->UpdateHealthBar(Stat->GetCurrentHealth());
 		Stat->OnHealthChanged.AddUObject(HealthBarWidget, &UCPHealthBarWidget::UpdateHealthBar);
 	}

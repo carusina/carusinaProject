@@ -3,6 +3,8 @@
 
 #include "Character/CPCharacterNonPlayer.h"
 
+#include "CPCharacterPlayer.h"
+
 ACPCharacterNonPlayer::ACPCharacterNonPlayer()
 {
 }
@@ -17,4 +19,18 @@ void ACPCharacterNonPlayer::SetDead()
 		{
 			Destroy();
 		}), DeadEventDelay, false);
+}
+
+float ACPCharacterNonPlayer::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+	class AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	ACPCharacterPlayer* Player = Cast<ACPCharacterPlayer>(EventInstigator->GetPawn());
+	if (Player)
+	{
+		Player->GainExperience(ExperienceReward);
+	}
+	
+	return DamageAmount;
 }

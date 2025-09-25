@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CPCharacterStat.h"
 #include "Components/ActorComponent.h"
 #include "CPCharacterStatComponent.generated.h"
 
@@ -17,26 +18,42 @@ class CARUSINAPROJECT_API UCPCharacterStatComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UCPCharacterStatComponent();
-
-	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
-	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
-	float ApplyDamage(float DamageAmount);
-
+	
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	virtual void InitializeComponent() override;
+	
+public:
+	FORCEINLINE const FCPCharacterStat& GetBaseStat() const { return BaseStat; }
+	FORCEINLINE void SetBaseStat(const FCPCharacterStat& NewBaseStat) { BaseStat = NewBaseStat; }
 
-	void SetCurrentHealth(const float NewHealth);
+	FORCEINLINE const FCPCharacterStat& GetBonusStat() const { return BonusStat; }
+	FORCEINLINE void AddBonusStat(const FCPCharacterStat& NewBonusStat) { BonusStat = BonusStat + NewBonusStat; }
 
+	FORCEINLINE FCPCharacterStat GetTotalStat() const { return BaseStat + BonusStat; }
+
+	FORCEINLINE int32 GetCurrentLevel() const { return CurrentLevel; }
+	void SetLevel(int32 NewLevel);
+	
+	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
+	void SetCurrentHealth(float NewHealth);
+	void HealHealth(float HealAmount);
+	
+	float ApplyDamage(float DamageAmount);
+	
 public:
 	FOnHealthZeroDelegate OnHealthZero;
 	FOnHealthChangedDelegate OnHealthChanged;
 	
 protected:
-	UPROPERTY(VisibleInstanceOnly, Category = "Stat|Health")
-	float MaxHealth;
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = "Stat")
+	FCPCharacterStat BaseStat;
+
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = "Stat")
+	FCPCharacterStat BonusStat;
+
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = "Stat")
+	int32 CurrentLevel;
 	
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = "Stat|Health")
 	float CurrentHealth;
-
 };
