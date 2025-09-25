@@ -137,6 +137,11 @@ void ACPCharacterBase::BasicActionEnd(class UAnimMontage* TargetMontage, bool Is
 {
 	ensure(CurrentCombo != 0);
 	CurrentCombo = 0;
+	NotifyBasicActionEnd();
+}
+
+void ACPCharacterBase::NotifyBasicActionEnd()
+{
 }
 
 void ACPCharacterBase::SetComboCheckTimer()
@@ -199,7 +204,7 @@ void ACPCharacterBase::AttackHitCheck()
 	const FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 
 	const float AttackRange = Stat->GetTotalStat().AttackRange;
-	const float AttackRadius = 50.0f;
+	const float AttackRadius = Stat->GetAttackRadius();
 	const float AttackDamage = Stat->GetTotalStat().AttackDamage;
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;

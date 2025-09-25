@@ -2,16 +2,16 @@
 
 
 #include "Animation/AnimNotify_AttackHitCheck.h"
-#include "INterface/CPAnimationAttackyInterface.h"
+#include "INterface/CPAnimationAttackInterface.h"
 
 void UAnimNotify_AttackHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
-										const FAnimNotifyEventReference& EventReference)
+                                        const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
 	if (MeshComp)
 	{
-		ICPAnimationAttackyInterface* AttackPawn = Cast<ICPAnimationAttackyInterface>(MeshComp->GetOwner());
+		ICPAnimationAttackInterface* AttackPawn = Cast<ICPAnimationAttackInterface>(MeshComp->GetOwner());
 		if (AttackPawn)
 		{
 			AttackPawn->AttackHitCheck();

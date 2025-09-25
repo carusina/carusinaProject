@@ -39,6 +39,8 @@ public:
 	void HealHealth(float HealAmount);
 	
 	float ApplyDamage(float DamageAmount);
+
+	FORCEINLINE float GetAttackRadius() const { return AttackRadius; }
 	
 public:
 	FOnHealthZeroDelegate OnHealthZero;
@@ -56,4 +58,7 @@ protected:
 	
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = "Stat|Health")
 	float CurrentHealth;
+
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = "Stat|Attack")
+	float AttackRadius;
 };

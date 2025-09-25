@@ -10,7 +10,7 @@ public class carusinaProject : ModuleRules
 		
 		PublicIncludePaths.AddRange(new string[] { "carusinaProject" });
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "NavigationSystem", "AIModule", "GameplayTasks", "GameplayTasks" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "AIModule", "Niagara" });
 

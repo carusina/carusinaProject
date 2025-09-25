@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Interface/CPAnimationAttackyInterface.h"
+#include "Interface/CPAnimationAttackInterface.h"
 #include "Interface/CPCharacterWidgetInterface.h"
 #include "CPCharacterBase.generated.h"
 
 UCLASS()
-class CARUSINAPROJECT_API ACPCharacterBase : public ACharacter, public ICPAnimationAttackyInterface, public ICPCharacterWidgetInterface
+class CARUSINAPROJECT_API ACPCharacterBase : public ACharacter, public ICPAnimationAttackInterface, public ICPCharacterWidgetInterface
 {
 	GENERATED_BODY()
 
@@ -28,6 +28,7 @@ protected:
 	void ClearDodgeCooldown();
 	void BasicActionBegin();
 	void BasicActionEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	virtual void NotifyBasicActionEnd();
 	void SetComboCheckTimer();
 	void ComboCheck();
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;

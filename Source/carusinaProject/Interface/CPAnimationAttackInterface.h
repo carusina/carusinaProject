@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "CPAnimationAttackyInterface.generated.h"
+#include "CPAnimationAttackInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UCPAnimationAttackyInterface : public UInterface
+class UCPAnimationAttackInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,7 +16,7 @@ class UCPAnimationAttackyInterface : public UInterface
 /**
  * 
  */
-class CARUSINAPROJECT_API ICPAnimationAttackyInterface
+class CARUSINAPROJECT_API ICPAnimationAttackInterface
 {
 	GENERATED_BODY()
 
