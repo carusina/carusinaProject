@@ -45,6 +45,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> DodgeAction;
 
+	// HUD Section
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
+	TSubclassOf<class UCPHUDWidget> CPHUDWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
+	TObjectPtr<class UCPHUDWidget> CPHUDWidget;
+
 private:
 	// Controlled Character
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Controlled, Meta = (AllowPrivateAccess = "true"))

@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "CharacterStat/CPCharacterStatComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "UI/CPHUDWidget.h"
 
 ACPCharacterPlayer::ACPCharacterPlayer()
 {
@@ -32,5 +33,14 @@ void ACPCharacterPlayer::GainExperience(float Amount)
 		
 		Stat->SetLevel(Stat->GetCurrentLevel() + 1);
 		GainExperience(0.0f);
+	}
+}
+
+void ACPCharacterPlayer::SetupHUDWidget(class UCPHUDWidget* InHUDWidgetPtr)
+{
+	if (InHUDWidgetPtr)
+	{
+		InHUDWidgetPtr->UpdateHealthBar(Stat->GetCurrentHealth(), Stat->GetTotalStat().MaxHealth);
+		Stat->OnHealthChanged.AddUObject(InHUDWidgetPtr, &UCPHUDWidget::UpdateHealthBar);
 	}
 }

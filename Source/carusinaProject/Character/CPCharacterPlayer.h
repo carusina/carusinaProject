@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "CPCharacterBase.h"
+#include "Interface/CPCharacterHUDInterface.h"
 #include "CPCharacterPlayer.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CARUSINAPROJECT_API ACPCharacterPlayer : public ACPCharacterBase
+class CARUSINAPROJECT_API ACPCharacterPlayer : public ACPCharacterBase, public ICPCharacterHUDInterface
 {
 	GENERATED_BODY()
 
@@ -19,6 +20,9 @@ public:
 
 public:
 	void GainExperience(float Amount);
+
+protected:
+	virtual void SetupHUDWidget(class UCPHUDWidget* InHUDWidgetPtr) override;
 	
 protected:
 	// Camera Section

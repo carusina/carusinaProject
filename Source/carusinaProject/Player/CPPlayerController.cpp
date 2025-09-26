@@ -9,6 +9,7 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Character/CPCharacterPlayer.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "UI/CPHUDWidget.h"
 
 ACPPlayerController::ACPPlayerController()
 {
@@ -42,6 +43,12 @@ ACPPlayerController::ACPPlayerController()
 	{
 		DodgeAction = DodgeActionRef.Object;
 	}
+
+	static ConstructorHelpers::FClassFinder<UCPHUDWidget> CPHUDWidgetRef(TEXT("/Game/carusinaProject/UI/WBP_HUD.WBP_HUD_C"));
+	if (CPHUDWidgetRef.Class)
+	{
+		CPHUDWidgetClass = CPHUDWidgetRef.Class;
+	}
 }
 
 void ACPPlayerController::BeginPlay()
@@ -62,6 +69,13 @@ void ACPPlayerController::BeginPlay()
 	}
 
 	ControlledCharacter = CastChecked<ACPCharacterPlayer>(GetPawn());
+	
+	CPHUDWidget = CreateWidget<UCPHUDWidget>(this, CPHUDWidgetClass);
+	if (CPHUDWidget)
+	{
+		UE_LOG(LogTemp, Log, TEXT("HUD Widget created"));
+		CPHUDWidget->AddToViewport();
+	}
 }
 
 void ACPPlayerController::SetupInputComponent()
